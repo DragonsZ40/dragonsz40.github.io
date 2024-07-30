@@ -9,7 +9,6 @@
 
 <body>
     <h1>Flutter WebView Demo</h1>
-    <input type="file" id="fileInput" accept="image/*">
     <button onclick="detectLiveness()">Detect Liveness</button>
     <button onclick="saveImage()">Save Image</button>
     <button onclick="getLocation()">Get Location</button>
@@ -17,27 +16,12 @@
 
     <script>
         function detectLiveness() {
-            const input = document.getElementById('fileInput');
-            const file = input.files[0];
-
-            if (file) {
-                const reader = new FileReader();
-
-                reader.onloadend = function() {
-                    const base64String = reader.result.replace('data:', '').replace(/^.+,/, '');
-
-                    if (window.flutter_inappwebview) {
-                        window.flutter_inappwebview.callHandler('detectLiveness', base64String).then(function(isLive) {
-                            document.getElementById('result').innerText = 'Liveness: ' + isLive;
-                        });
-                    } else {
-                        console.log('Flutter InAppWebView not found');
-                    }
-                };
-
-                reader.readAsDataURL(file);
+            if (window.flutter_inappwebview) {
+                window.flutter_inappwebview.callHandler('detectLiveness').then(function(isLive) {
+                    document.getElementById('result').innerText = 'Liveness: ' + isLive;
+                });
             } else {
-                document.getElementById('result').innerText = 'No image selected';
+                console.log('Flutter InAppWebView not found');
             }
         }
 
