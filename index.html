@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Flutter WebView Demo</title>
+</head>
+
+<body>
+    <h1>Flutter WebView Demo</h1>
+    <input type="file" id="fileInput" accept="image/*">
+    <button onclick="detectLiveness()">Detect Liveness</button>
+    <p id="result"></p>
+
+    <script>
+        // ฟังก์ชันหลักในการตรวจจับ liveness
+        function detectLiveness() {
+            const input = document.getElementById('fileInput');
+            const file = input.files[0];
+
+            if (file) {
+                const reader = new FileReader();
+
+                // เมื่ออ่านไฟล์เสร็จสิ้น
+                reader.onloadend = function() {
+                    const base64String = reader.result.replace('data:', '').replace(/^.+,/, '');
+
+                    if (window.flutter_inappwebview) {
+                        window.flutter_inappwebview.callHandler('detectLiveness', base64String).then(function(isLive) {
+                            document.getElementById('result').innerText = 'Liveness: ' + isLive;
+                        });
+                    } else {
+                        console.log('Flutter InAppWebView not found');
+                    }
+                };
+
+                // อ่านไฟล์เป็น Data URL
+                reader.readAsDataURL(file);
+            } else {
+                document.getElementById('result').innerText = 'No image selected';
+            }
+        }
+    </script>
+</body>
+
+</html>
