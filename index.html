@@ -11,10 +11,11 @@
     <h1>Flutter WebView Demo</h1>
     <input type="file" id="fileInput" accept="image/*">
     <button onclick="detectLiveness()">Detect Liveness</button>
+    <button onclick="saveImage()">Save Image</button>
+    <button onclick="getLocation()">Get Location</button>
     <p id="result"></p>
 
     <script>
-        // ฟังก์ชันหลักในการตรวจจับ liveness
         function detectLiveness() {
             const input = document.getElementById('fileInput');
             const file = input.files[0];
@@ -22,7 +23,6 @@
             if (file) {
                 const reader = new FileReader();
 
-                // เมื่ออ่านไฟล์เสร็จสิ้น
                 reader.onloadend = function() {
                     const base64String = reader.result.replace('data:', '').replace(/^.+,/, '');
 
@@ -35,10 +35,44 @@
                     }
                 };
 
-                // อ่านไฟล์เป็น Data URL
                 reader.readAsDataURL(file);
             } else {
                 document.getElementById('result').innerText = 'No image selected';
+            }
+        }
+
+        function saveImage() {
+            const input = document.getElementById('fileInput');
+            const file = input.files[0];
+
+            if (file) {
+                const reader = new FileReader();
+
+                reader.onloadend = function() {
+                    const base64String = reader.result.replace('data:', '').replace(/^.+,/, '');
+
+                    if (window.flutter_inappwebview) {
+                        window.flutter_inappwebview.callHandler('saveImage', base64String).then(function(imagePath) {
+                            document.getElementById('result').innerText = 'Image saved at: ' + imagePath;
+                        });
+                    } else {
+                        console.log('Flutter InAppWebView not found');
+                    }
+                };
+
+                reader.readAsDataURL(file);
+            } else {
+                document.getElementById('result').innerText = 'No image selected';
+            }
+        }
+
+        function getLocation() {
+            if (window.flutter_inappwebview) {
+                window.flutter_inappwebview.callHandler('getLocation').then(function(location) {
+                    document.getElementById('result').innerText = 'Location: ' + location.latitude + ', ' + location.longitude;
+                });
+            } else {
+                console.log('Flutter InAppWebView not found');
             }
         }
     </script>
