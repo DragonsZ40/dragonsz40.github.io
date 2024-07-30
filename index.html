@@ -17,8 +17,8 @@
     <script>
         function detectLiveness() {
             if (window.flutter_inappwebview) {
-                window.flutter_inappwebview.callHandler('detectLiveness').then(function(isLive) {
-                    document.getElementById('result').innerText = 'Liveness: ' + isLive;
+                window.flutter_inappwebview.callHandler('detectLiveness').then(function(result) {
+                    document.getElementById('result').innerText = result;
                 });
             } else {
                 console.log('Flutter InAppWebView not found');
@@ -26,28 +26,27 @@
         }
 
         function saveImage() {
-            const input = document.getElementById('fileInput');
-            const file = input.files[0];
-
-            if (file) {
-                const reader = new FileReader();
-
-                reader.onloadend = function() {
-                    const base64String = reader.result.replace('data:', '').replace(/^.+,/, '');
-
-                    if (window.flutter_inappwebview) {
-                        window.flutter_inappwebview.callHandler('saveImage', base64String).then(function(imagePath) {
-                            document.getElementById('result').innerText = 'Image saved at: ' + imagePath;
-                        });
-                    } else {
-                        console.log('Flutter InAppWebView not found');
-                    }
-                };
-
-                reader.readAsDataURL(file);
-            } else {
-                document.getElementById('result').innerText = 'No image selected';
-            }
+            const input = document.createElement('input');
+            input.type = 'file';
+            input.accept = 'image/*';
+            input.onchange = function(event) {
+                const file = event.target.files[0];
+                if (file) {
+                    const reader = new FileReader();
+                    reader.onloadend = function() {
+                        const base64String = reader.result.replace('data:', '').replace(/^.+,/, '');
+                        if (window.flutter_inappwebview) {
+                            window.flutter_inappwebview.callHandler('saveImage', base64String).then(function(imagePath) {
+                                document.getElementById('result').innerText = 'Image saved at: ' + imagePath;
+                            });
+                        } else {
+                            console.log('Flutter InAppWebView not found');
+                        }
+                    };
+                    reader.readAsDataURL(file);
+                }
+            };
+            input.click();
         }
 
         function getLocation() {
